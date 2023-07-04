@@ -21,27 +21,30 @@ const ProfilePage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
         { getNextPageParam: (lastPage) => lastPage.nextCursor }
     );
     const trpcUtils = api.useContext()
-    const toggleFollow = api.profile.toggleFollow.useMutation({ onSuccess: ({
-        addedFollow}) => {
-trpcUtils.profile.getById.setData({ id}, oldData => {
-    if (oldData == null) return
+    const toggleFollow = api.profile.toggleFollow.useMutation({
+        onSuccess: ({
+            addedFollow }) => {
+            trpcUtils.profile.getById.setData({ id }, oldData => {
+                if (oldData == null) return
 
-    const countModifier = addedFollow ? 1 : -1
-    return {
-        ...oldData,
-        isFollowing: addedFollow,
-        followersCount: oldData.followersCount + countModifier,
+                const countModifier = addedFollow ? 1 : -1
+                return {
+                    ...oldData,
+                    isFollowing: addedFollow,
+                    followersCount: oldData.followersCount + countModifier,
+                }
+            })
+        }
     }
-})
-        } }
-        )
+    )
 
     if (profile == null || profile.name == null) {
         return <ErrorPage statusCode={404} />;
     }
 
-
-    return <>
+    return (
+    
+    <>
         <Head>
             <title>{`Twitter Clone - ${profile.name}`}</title>
         </Head>
@@ -68,7 +71,7 @@ trpcUtils.profile.getById.setData({ id}, oldData => {
                 isFollowing={profile.isFollowing}
                 isLoading={toggleFollow.isLoading}
                 userId={id}
-                onClick={() => toggleFollow.mutate( { userId: id})} />
+                onClick={() => toggleFollow.mutate({ userId: id })} />
         </header>
         <main>
             <InifiniteTweets
@@ -80,9 +83,11 @@ trpcUtils.profile.getById.setData({ id}, oldData => {
             />
         </main>
     </>
+    );
+    
 };
 
-function FollowButton({ userId, isFollowing, isLoading,  onClick }: {
+function FollowButton({ userId, isFollowing, isLoading, onClick }: {
     userId: string; isFollowing: boolean; isLoading: boolean, onClick: () => void;
 }) {
 
@@ -90,7 +95,7 @@ function FollowButton({ userId, isFollowing, isLoading,  onClick }: {
 
     if (session.status !== "authenticated" || session.data.user.id === userId) {
         return null
-    }
+    };
     return (
         <Button disabled={isLoading} onClick={onClick} small gray={isFollowing}>
             {isFollowing ? "UnFollow" : "Follow"}
@@ -125,11 +130,11 @@ export async function getStaticProps(context: GetStaticPropsContext<{ id: string
 
     return {
         props: {
-
             trpcState: ssg.dehydrate(),
             id
         }
     }
 }
+
 
 export default ProfilePage;
