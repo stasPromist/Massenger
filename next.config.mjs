@@ -7,6 +7,19 @@ await import("./src/env.mjs");
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
+  images: { domains: ["cdn.discordapp.com"]},
+  
+    // images: {
+    //   remotePatterns: [
+    //     {
+    //       protocol: 'https',
+    //       hostname: 'cdn.discordapp.com',
+    //       port: '',
+    //       pathname: '/account123/**',
+    //     },
+    //   ],
+    // },
+  
 
   /**
    * If you have `experimental: { appDir: true }` set, then you must comment the below `i18n` config
@@ -18,6 +31,7 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
+  
 };
 
 export default config;

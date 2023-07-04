@@ -2,15 +2,38 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mysql"
-  url = env("DATABASE_URL")
-  relationMode = "prisma"
+    provider     = "mysql"
+    url          = env("DATABASE_URL")
+    relationMode = "prisma"
 }
 
+model Message {
+    id        String   @id @default(uuid())
+    userId    String
+    content   String
+    createdAt DateTime @default(now())
+
+    user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    likes Like[]
+
+    @@index([userId])
+    @@unique([createdAt, id])
+}
+
+model Like {
+    userId    String
+    messageId String
+    user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    Message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+    @@id([userId, messageId])
+    @@index([userId])
+    @@index([messageId])
+}
 
 // generator client {
 //     provider = "prisma-client-js"
@@ -26,11 +49,11 @@ datasource db {
 //     url      = env("DATABASE_URL")
 // }
 
-model Example {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-}
+// model Example {
+//     id        String   @id @default(cuid())
+//     createdAt DateTime @default(now())
+//     updatedAt DateTime @updatedAt
+// }
 
 // Necessary for Next auth
 model Account {
@@ -40,11 +63,11 @@ model Account {
     provider          String
     providerAccountId String
     refresh_token     String? @db.Text
-    access_token      String?  @db.Text
+    access_token      String? @db.Text
     expires_at        Int?
     token_type        String?
     scope             String?
-    id_token          String?  @db.Text
+    id_token          String? @db.Text
     session_state     String?
     user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -70,6 +93,10 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
+    messages      Message[]
+    likes         Like[]
+    followers     User[]    @relation(name: "Followers")
+    follows       User[]    @relation(name: "Followers")
 }
 
 model VerificationToken {
