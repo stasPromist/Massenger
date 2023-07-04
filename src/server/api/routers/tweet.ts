@@ -42,7 +42,10 @@ export const tweetRouter = createTRPCRouter({
   create: protectedProcedure
     .input(z.object({ content: z.string() }))
     .mutation(async ({ input: { content }, ctx}) => {
-     const tweet =  await ctx.prisma.message.create({ data: { content, userId: ctx.session.user.id},})
+     const tweet =  await ctx.prisma.message.create({ data: { content, userId: ctx.session.user.id},});
+
+     void  ctx.revalidateSSG?.(`/profiles/${ctx.session.user.id}`)
+
     return tweet;
   }),
 
